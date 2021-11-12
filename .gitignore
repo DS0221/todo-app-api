@@ -10,3 +10,7 @@ target
 docker/db/data/
 .DS_Store
 .vscode
+.metals/
+.bloop/
+.ammonite/
+metals.sbt
