@@ -1,0 +1,22 @@
+@(vv: model.ViewValueCategoryList)
+@common.Default(vv){
+<div style="width: 100%;">
+    <div style="margin-bottom: 20px; text-align: right;">
+        <button onclick="location.href='/addCategory'">➕Category追加</button>
+    </div>
+    @for(category <- vv.categoryList) {
+        <div class="todo">
+            <div class="categoryName">@category.name</div>
+            <div class="categorySlug">@category.slug</div>
+            <div class="@category.color categoryColor">@category.color</div>
+            <div style="text-align: right; margin-top: 5px;">
+                <button onclick="location.href='/editCategory?id=@category.id'">編集</button>
+                <button onclick="location.href='/deleteCategory?id=@category.id'">削除</button>
+            </div>
+        </div>
+    }
+    <div>
+        <button onclick="location.href='/'">Home戻る</button>
+    </div>
+</div>
+}

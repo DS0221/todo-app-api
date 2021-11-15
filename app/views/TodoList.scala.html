@@ -1,0 +1,23 @@
+@(vv: model.ViewValueToDoList)
+@common.Default(vv){
+<div style="width: 100%;">
+    <div style="margin-bottom: 20px; text-align: right;">
+        <button onclick="location.href='/addTodo'">➕TODO追加</button>
+    </div>
+    @for(toDo <- vv.toDoList) {
+        <div class="todo">
+            <div class="@toDo.categoryColor toDoCategory">@toDo.categoryName</div>
+            <div class="todoTitle">@toDo.title</div>
+            <div class="todoState">@toDo.state</div>
+            <div class="todoBody">@toDo.body</div>
+            <div style="text-align: right;">
+                <button onclick="location.href='/editTodo?id=@toDo.id'">編集</button>
+                <button onclick="location.href='/deleteTodo?id=@toDo.id'">削除</button>
+            </div>
+        </div>
+    }
+    <div>
+        <button onclick="location.href='/'">Home戻る</button>
+    </div>
+</div>
+}
