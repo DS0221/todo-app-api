@@ -1,0 +1,25 @@
+@(vv: model.ViewValueToDoNew, categories: Seq[(String, String)])(implicit request: RequestHeader, messagesProvider: MessagesProvider, token: play.filters.csrf.CSRF.Token)
+@import helper._
+
+@common.Default(vv){
+<div style="width: 100%;">
+    @form(action = routes.TodoListController.newTodoSave()) {
+        @CSRF.formField
+        <fieldset style="margin-bottom: 20px;">
+            @inputText(vv.inputForm("title"), '_label -> "タイトル", '_class -> "newTodoTitle")
+            @select(
+                vv.inputForm("category"),
+                categories,
+                '_label -> "カテゴリー",
+                '_showConstraints -> false,
+                '_class -> "newTodoCategory"
+            )
+            @textarea(vv.inputForm("body"), '_label -> "本文", '_class -> "newTodoBody")
+        </fieldset>
+        <div style="text-align: right;">
+            <button style="margin-right: 10px;" type="submit">新規登録</button><button type="button" onclick="location.href='@routes.HomeController.index()'">Home戻る</button>
+        </div>
+    }
+    
+</div>
+}

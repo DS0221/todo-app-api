@@ -107,6 +107,20 @@ body {
   display: block;
 }
 
+/** todo新規登録 */
+.newTodoTitle input{
+  width: 500px;
+}
+
+.newTodoCategory select{
+  width: 500px;
+}
+
+.newTodoBody textarea {
+  width:  100%;
+  height: 200px;
+}
+
 /** カテゴリ */
 .categoryName {
   width: 70%;

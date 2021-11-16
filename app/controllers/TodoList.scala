@@ -12,12 +12,23 @@ import play.api.mvc._
 import model.ViewValueHome
 import lib.persistence.onMySQL._
 import scala.concurrent.Await
+import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 import model.ViewValueToDoList
+import play.api.data._
+import play.api.data.Forms._
+import akka.http.scaladsl.model.HttpHeader
+import model.ViewValueToDoNew
+import play.filters.csrf.CSRF
+import ixias.model.Entity
+import model.ToDo
+import monix.execution.misc.AsyncVar
+import model.Category
+import cats.instances.long
 
 case class ToDoForm(
-    categoryName:  Option[String],
+    categoryName:   Option[String],
     title:          String,
     body:           String,
     state:          String,
@@ -25,38 +36,93 @@ case class ToDoForm(
     id:             Long
 )
 
+case class ToDoNew(
+  title:      String,
+  body:       String,
+  category:   Long
+)
+
 @Singleton
-class TodoListController @Inject()(val controllerComponents: ControllerComponents) extends BaseController {
+class TodoListController @Inject()(val controllerComponents: ControllerComponents) extends BaseController with play.api.i18n.I18nSupport{
 
-  def list() = Action { implicit req =>
+  val todoInputForm = Form (
+    mapping(
+      "title" -> nonEmptyText,
+      "body" -> text,
+      "category" -> longNumber
+    )(ToDoNew.apply)(ToDoNew.unapply)
+  )
 
-    val toDoListFuture = for {
+  def list() = Action.async {
+    for {
       todos <- ToDoRepository.getAll()
       categories <- CategoryRepository.getAll()
     } yield {
-      todos.map(
-        todo =>
-          ToDoForm(
-            categories.find(_.id == todo.v.categoryId).map(_.v.name),
-            todo.v.title,
-            todo.v.body,
-            todo.v.state.name,
-            categories.find(_.id == todo.v.categoryId).map(_.v.color.name)
-            ,todo.id
-          )
+      val todoList = for {
+        todo <- todos
+      } yield {
+        val category = categories.find(_.id == todo.v.categoryId)
+        ToDoForm(
+          category.map(_.v.name),
+          todo.v.title,
+          todo.v.body,
+          todo.v.state.name,
+          category.map(_.v.color.name),
+          todo.id
+        )
+      }
+
+      val vv = ViewValueToDoList(
+        title  = "Todo一覧",
+        cssSrc = Seq("main.css"),
+        jsSrc  = Seq("main.js"),
+        toDoList = todoList
       )
+      Ok(views.html.TodoList(vv))
     }
+  }
 
-    val toDoList = Await.ready(toDoListFuture, Duration.Inf).value.get.toEither.getOrElse(Seq.empty)
-
-    val vv = ViewValueToDoList(
-      title  = "Todo一覧",
+  def newTodo() = Action.async { implicit req =>
+    implicit val token = CSRF.getToken(req).get
+    
+    val vv = ViewValueToDoNew(
+      title  = "Todo新規登録",
       cssSrc = Seq("main.css"),
       jsSrc  = Seq("main.js"),
-      toDoList = toDoList
+      inputForm = todoInputForm
     )
+    for {
+      categories <- CategoryRepository.getAll().map(categories => categories.map(category => (category.id.toString(),category.v.name)))
+    }yield {
+      Ok(views.html.NewTodo(vv,categories))
+    }
+ 
+  }
 
-    Ok(views.html.TodoList(vv))
+  def newTodoSave() = Action.async { implicit req =>
+
+    implicit val token = CSRF.getToken(req).get
+    todoInputForm.bindFromRequest().fold(
+      formWithErrors => {
+        for {
+          categories <- CategoryRepository.getAll().map(categories => categories.map(category => (category.id.toString(),category.v.name)))
+        }yield {
+          BadRequest(views.html.NewTodo(ViewValueToDoNew(
+            title  = "Todo新規登録",
+            cssSrc = Seq("main.css"),
+            jsSrc  = Seq("main.js"),
+            inputForm = formWithErrors
+          ), categories))
+        }
+      },
+      inputData => {
+        for {
+          newTodo <- ToDoRepository.add(ToDo(title = inputData.title, body = inputData.body, categoryId = inputData.category))
+        } yield {
+          Redirect(routes.TodoListController.list())
+        }
+      }
+    )
   }
 
 }

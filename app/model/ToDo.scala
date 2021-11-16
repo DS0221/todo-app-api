@@ -5,13 +5,23 @@ import ixias.util.EnumStatus
 
 import java.time.LocalDateTime
 import controllers.ToDoForm
+import play.api.data.Form
+import controllers.ToDoNew
 
-// todoのviewvalue
+// todoの一覧出力時viewvalue
 case class ViewValueToDoList(
   title:  String,
   cssSrc: Seq[String],
   jsSrc:  Seq[String],
   toDoList: Seq[ToDoForm]
+) extends ViewValueCommon
+
+// todoの新規作成時viewvalue
+case class ViewValueToDoNew(
+  title:  String,
+  cssSrc: Seq[String],
+  jsSrc:  Seq[String],
+  inputForm: Form[ToDoNew]
 ) extends ViewValueCommon
 
 // toDoModel

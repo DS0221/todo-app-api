@@ -8,6 +8,10 @@ GET     /                             controllers.HomeController.index
 
 GET     /todoList                     controllers.TodoListController.list
 
+GET     /newTodo                      controllers.TodoListController.newTodo
+
+POST    /newTodoSave                  controllers.TodoListController.newTodoSave
+
 GET     /categoryList                 controllers.CategoryListController.list
 
 # Map static resources from the /public folder to the /assets URL path

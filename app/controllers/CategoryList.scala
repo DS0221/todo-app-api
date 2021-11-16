@@ -27,32 +27,26 @@ case class CategoryForm(
 @Singleton
 class CategoryListController @Inject()(val controllerComponents: ControllerComponents) extends BaseController {
 
-  def list() = Action { implicit req =>
+  def list() = Action.async {
 
-    val categoryListFuture = for {
-      categories <- CategoryRepository.getAll()
-    } yield {
-      categories.map(
-        category =>
-          CategoryForm(
-            category.v.name,
-            category.v.slug,
-            category.v.color.name,
-            category.id
+    CategoryRepository.getAll().map(
+      categories => {
+        val vv = ViewValueCategoryList(
+          title  = "カテゴリー一覧",
+          cssSrc = Seq("main.css"),
+          jsSrc  = Seq("main.js"),
+          categoryList = categories.map(
+            category =>
+            CategoryForm(
+              category.v.name,
+              category.v.slug,
+              category.v.color.name,
+              category.id
+            )    
           )
-      )
-    }
-
-    val categoryList = Await.ready(categoryListFuture, Duration.Inf).value.get.toEither.getOrElse(Seq.empty)
-
-    val vv = ViewValueCategoryList(
-      title  = "カテゴリー一覧",
-      cssSrc = Seq("main.css"),
-      jsSrc  = Seq("main.js"),
-      categoryList = categoryList
+        )
+        Ok(views.html.CategoryList(vv))
+      }
     )
-
-    Ok(views.html.CategoryList(vv))
   }
-
 }
