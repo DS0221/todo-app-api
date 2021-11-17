@@ -1,0 +1,31 @@
+@(vv: model.ViewValueToDoEdit, categories: Seq[(String, String)], status: Seq[(String, String)])(implicit request: RequestHeader, messagesProvider: MessagesProvider, token: play.filters.csrf.CSRF.Token)
+@import helper._
+
+@common.Default(vv){
+<div style="width: 100%;">
+    @form(action = routes.TodoListController.editTodoSave(vv.todoId)) {
+        @CSRF.formField
+        <fieldset style="margin-bottom: 20px;">
+            @inputText(vv.inputForm("title"), '_label -> "タイトル", '_class -> "newTodoTitle")
+            @select(
+                vv.inputForm("category"),
+                categories,
+                '_label -> "カテゴリー",
+                '_showConstraints -> false,
+                '_class -> "newTodoCategory"
+            )
+            @select(
+                vv.inputForm("state"),
+                status,
+                '_label -> "ステータス",
+                '_showConstraints -> false,
+                '_class -> "newTodoStatus"
+            )
+            @textarea(vv.inputForm("body"), '_label -> "本文", '_class -> "newTodoBody")
+        </fieldset>
+        <div style="text-align: right;">
+            <button style="margin-right: 10px;" type="submit">修正</button><button type="button" onclick="location.href='@routes.TodoListController.list()'">リストへ戻る</button>
+        </div>
+    }
+</div>
+}

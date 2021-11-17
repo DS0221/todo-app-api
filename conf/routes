@@ -12,6 +12,12 @@ GET     /newTodo                      controllers.TodoListController.newTodo
 
 POST    /newTodoSave                  controllers.TodoListController.newTodoSave
 
+GET     /editTodo/:todoId             controllers.TodoListController.editTodo(todoId : Long)
+
+POST    /editTodoSave                 controllers.TodoListController.editTodoSave(todoId : Long)
+
+GET     /deleteTodo/:todoId           controllers.TodoListController.deleteTodo(todoId : Long)
+
 GET     /categoryList                 controllers.CategoryListController.list
 
 # Map static resources from the /public folder to the /assets URL path

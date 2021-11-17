@@ -17,9 +17,8 @@
             @textarea(vv.inputForm("body"), '_label -> "本文", '_class -> "newTodoBody")
         </fieldset>
         <div style="text-align: right;">
-            <button style="margin-right: 10px;" type="submit">新規登録</button><button type="button" onclick="location.href='@routes.HomeController.index()'">Home戻る</button>
+            <button style="margin-right: 10px;" type="submit">新規登録</button><button type="button" onclick="location.href='@routes.TodoListController.list()'">リストへ戻る</button>
         </div>
     }
-    
 </div>
 }

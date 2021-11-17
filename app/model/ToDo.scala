@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 import controllers.ToDoForm
 import play.api.data.Form
 import controllers.ToDoNew
+import controllers.ToDoEdit
 
 // todoの一覧出力時viewvalue
 case class ViewValueToDoList(
@@ -22,6 +23,15 @@ case class ViewValueToDoNew(
   cssSrc: Seq[String],
   jsSrc:  Seq[String],
   inputForm: Form[ToDoNew]
+) extends ViewValueCommon
+
+// todoの修正時viewvalue
+case class ViewValueToDoEdit(
+  title:  String,
+  cssSrc: Seq[String],
+  jsSrc:  Seq[String],
+  inputForm: Form[ToDoEdit],
+  todoId : Long
 ) extends ViewValueCommon
 
 // toDoModel
@@ -60,6 +70,19 @@ object ToDo {
         title = title,
         body = body,
         state = Status.IS_BEFORE
+      )
+    )
+  }
+
+  // 更新時
+  def apply(id: Long, title: String, body: String, categoryId: Long, state: Status) : EmbeddedId = {
+    new Entity.EmbeddedId(
+      new ToDo(
+        id = Some(ToDo.Id(id)),
+        categoryId = categoryId,
+        title = title,
+        body = body,
+        state = state
       )
     )
   }
