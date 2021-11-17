@@ -54,9 +54,14 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
   )
 
   def list() = Action.async {
+    
+    val todosFuture = ToDoRepository.getAll()
+    
+    val categoryFuture = CategoryRepository.getAll()
+    
     for {
-      todos <- ToDoRepository.getAll()
-      categories <- CategoryRepository.getAll()
+      todos <- todosFuture
+      categories <- categoryFuture
     } yield {
       val todoList = for {
         todo <- todos
