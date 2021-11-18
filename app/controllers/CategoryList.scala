@@ -100,8 +100,7 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
 
     categoryNewForm.bindFromRequest().fold(
       formWithErrors => {
-        Future {
-          println(categoryNewForm.data)
+        Future.successful {
           BadRequest(views.html.NewCategory(ViewValueCategoryNew(
             title  = "カテゴリー新規登録",
             cssSrc = Seq("main.css"),
