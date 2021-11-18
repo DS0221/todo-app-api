@@ -10,8 +10,8 @@
             <div class="categorySlug">@category.slug</div>
             <div class="@category.color categoryColor">@category.color</div>
             <div style="text-align: right; margin-top: 5px;">
-                <button onclick="location.href='/editCategory?id=@category.id'">編集</button>
-                <button onclick="location.href='/deleteCategory?id=@category.id'">削除</button>
+                <button onclick="location.href='@routes.CategoryListController.editCategory(category.id)'">編集</button>
+                <button onclick="location.href='@routes.CategoryListController.deleteCategory(category.id)'">削除</button>
             </div>
         </div>
     }

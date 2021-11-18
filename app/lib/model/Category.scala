@@ -47,4 +47,17 @@ object Category {
       )
     )
   }
+
+  // 更新時
+  def apply(id: Long, name: String, slug: String, color: CategoryColor) : EmbeddedId = {
+    new Entity.EmbeddedId(
+      new Category(
+        id = Some(Category.Id(id)),
+        name = name,
+        slug = slug,
+        color = color
+      )
+    )
+  }
+
 }

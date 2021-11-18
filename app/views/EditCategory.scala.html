@@ -1,0 +1,24 @@
+@(vv: model.ViewValueCategoryEdit, colorMap: Seq[(String, String)])(implicit request: RequestHeader, messagesProvider: MessagesProvider, token: play.filters.csrf.CSRF.Token)
+@import helper._
+
+@common.Default(vv){
+<div style="width: 100%;">
+    @form(action = routes.CategoryListController.editCategorySave(vv.categoryId)) {
+        @CSRF.formField
+        <fieldset style="margin-bottom: 20px;">
+            @inputText(vv.inputForm("name"), '_label -> "カテゴリー名", '_class -> "newTodoTitle")
+            @inputText(vv.inputForm("slug"), '_label -> "slug", '_class -> "newTodoTitle")
+            @select(
+                vv.inputForm("color"),
+                colorMap,
+                '_label -> "色",
+                '_showConstraints -> false,
+                '_class -> "newTodoCategory"
+            )
+        </fieldset>
+        <div style="text-align: right;">
+            <button style="margin-right: 10px;" type="submit">修正</button><button type="button" onclick="location.href='@routes.CategoryListController.list()'">リストへ戻る</button>
+        </div>
+    }
+</div>
+}

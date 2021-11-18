@@ -72,4 +72,18 @@ case class ToDoRepository[P <: JdbcProfile]()(implicit val driver: P)
         }
       } yield old
     }
+  
+  def removeFromCategory(categoryId: Long): Future[Option[EntityEmbeddedId]] = 
+    RunDBAction(ToDoTable) {
+      slick =>
+        val row = slick.filter(_.categoryId === categoryId)
+        for {
+          old <- row.result.headOption
+          _   <- old match {
+            case None    => DBIO.successful(0)
+            case Some(_) => row.delete
+          }
+        } yield old
+    
+  }
 }

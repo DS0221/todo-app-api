@@ -18,6 +18,14 @@ case class ViewValueCategoryNew(
   inputForm: Form[CategoryNew]
 ) extends ViewValueCommon
 
+case class ViewValueCategoryEdit(
+  title:  String,
+  cssSrc: Seq[String],
+  jsSrc:  Seq[String],
+  inputForm: Form[CategoryEdit],
+  categoryId : Long
+) extends ViewValueCommon
+
 case class CategoryForm(
     name:           String,
     slug:           String,
@@ -26,6 +34,12 @@ case class CategoryForm(
 )
 
 case class CategoryNew(
+  name:      String,
+  slug:      String,
+  color:     Short
+)
+
+case class CategoryEdit(
   name:      String,
   slug:      String,
   color:     Short
