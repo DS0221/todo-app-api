@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 import slick.jdbc.JdbcProfile
 import ixias.persistence.model.Table
 
-import model.ToDo
+import lib.model.ToDo
 
 case class ToDoTable[P <: JdbcProfile]()(implicit val driver: P)
   extends Table[ToDo, P] {

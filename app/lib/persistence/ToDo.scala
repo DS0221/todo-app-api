@@ -7,7 +7,7 @@ package lib.persistence
 
 import scala.concurrent.Future
 import ixias.persistence.SlickRepository
-import model.ToDo
+import lib.model.ToDo
 import slick.jdbc.JdbcProfile
 
 // ToDoRepository: ToDoTableへのクエリ発行を行うRepository層の定義

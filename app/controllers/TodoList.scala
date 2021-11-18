@@ -21,35 +21,17 @@ import play.api.data.Forms._
 import akka.http.scaladsl.model.HttpHeader
 import model.ViewValueToDoNew
 import model.ViewValueToDoEdit
+import model.ToDoForm
+import model.ToDoEdit
+import model.ToDoNew
 import play.filters.csrf.CSRF
 import ixias.model.Entity
-import model.ToDo
+import lib.model.ToDo
 import monix.execution.misc.AsyncVar
-import model.Category
+import lib.model.Category
 import cats.instances.long
 import java.{util => ju}
 
-case class ToDoForm(
-    categoryName:   Option[String],
-    title:          String,
-    body:           String,
-    state:          String,
-    categoryColor:  Option[String],
-    id:             Long
-)
-
-case class ToDoNew(
-  title:      String,
-  body:       String,
-  category:   Long
-)
-
-case class ToDoEdit(
-  title:      String,
-  body:       String,
-  category:   Long,
-  state:      Short
-)
 
 @Singleton
 class TodoListController @Inject()(val controllerComponents: ControllerComponents) extends BaseController with play.api.i18n.I18nSupport{

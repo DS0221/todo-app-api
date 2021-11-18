@@ -16,25 +16,16 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
 import model.ViewValueCategoryList
 import model.ViewValueCategoryNew
+import model.CategoryForm
+import model.CategoryNew
 import play.api.data.Form
 import play.api.data.Forms._
 import play.filters.csrf.CSRF
-import model.Category
+import lib.model.Category
 import akka.http.scaladsl.model.HttpHeader
 import scala.concurrent.Future
 
-case class CategoryForm(
-    name:           String,
-    slug:           String,
-    color:          String,
-    id:             Long
-)
 
-case class CategoryNew(
-  name:      String,
-  slug:      String,
-  color:     Short
-)
 
 @Singleton
 class CategoryListController @Inject()(val controllerComponents: ControllerComponents) extends BaseController with play.api.i18n.I18nSupport{

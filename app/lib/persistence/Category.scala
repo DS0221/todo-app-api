@@ -7,7 +7,7 @@ package lib.persistence
 
 import scala.concurrent.Future
 import ixias.persistence.SlickRepository
-import model.Category
+import lib.model.Category
 import slick.jdbc.JdbcProfile
 
 // CategoryRepository: CategoryTableへのクエリ発行を行うRepository層の定義

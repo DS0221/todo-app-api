@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 import slick.jdbc.JdbcProfile
 import ixias.persistence.model.Table
 
-import model.Category
+import lib.model.Category
 
 case class CategoryTable[P <: JdbcProfile]()(implicit val driver: P)
   extends Table[Category, P] {
