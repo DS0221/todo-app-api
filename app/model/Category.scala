@@ -5,6 +5,8 @@ import ixias.util.EnumStatus
 
 import java.time.LocalDateTime
 import controllers.CategoryForm
+import play.api.data.Form
+import controllers.CategoryNew
 
 // categoryのviewvalue
 case class ViewValueCategoryList(
@@ -12,6 +14,14 @@ case class ViewValueCategoryList(
   cssSrc: Seq[String],
   jsSrc:  Seq[String],
   categoryList: Seq[CategoryForm]
+) extends ViewValueCommon
+
+// categoryの新規作成時viewvalue
+case class ViewValueCategoryNew(
+  title:  String,
+  cssSrc: Seq[String],
+  jsSrc:  Seq[String],
+  inputForm: Form[CategoryNew]
 ) extends ViewValueCommon
 
 // categoryModel
@@ -38,6 +48,8 @@ object Category {
     case object WHITE extends CategoryColor(code = 6, name = "WHITE")
     case object SALMON extends CategoryColor(code = 7, name = "SALMON")
   }
+
+  
 
   val  Id = the[Identity[Id]]
   type Id = Long @@ Category
