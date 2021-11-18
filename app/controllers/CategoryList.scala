@@ -164,7 +164,7 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
 
     categoryEditForm.bindFromRequest().fold(
       formWithErrors => {
-        Future {
+        Future.successful {
           BadRequest(views.html.EditCategory(ViewValueCategoryEdit(
               title  = "カテゴリー修正",
               cssSrc = Seq("main.css"),
