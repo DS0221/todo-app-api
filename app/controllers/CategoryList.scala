@@ -34,12 +34,24 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
 
   val colorMap = Category.CategoryColor.values.map(value => (value.code.toString(),value.name))
 
+  val categoryNewForm = Form (
+      mapping(
+        "name" -> nonEmptyText,
+        "slug" -> nonEmptyText.verifying("英数字のみ", {slug => slug.matches("^[a-zA-Z0-9]*$")}),
+        "color" -> shortNumber
+      )
+      ((name: String, slug: String, color: Short) => CategoryNew.apply(name, slug, Category.CategoryColor(color)))
+      (CategoryNew => Option(CategoryNew.name, CategoryNew.slug, CategoryNew.color.code))
+    )
+
   val categoryEditForm = Form (
       mapping(
         "name" -> nonEmptyText,
         "slug" -> nonEmptyText.verifying("英数字のみ", {slug => slug.matches("^[a-zA-Z0-9]*$")}),
         "color" -> shortNumber
-      )(CategoryEdit.apply)(CategoryEdit.unapply)
+      )
+      ((name: String, slug: String, color: Short) => CategoryEdit.apply(name, slug, Category.CategoryColor(color)))
+      (CategoryEdit => Option(CategoryEdit.name, CategoryEdit.slug, CategoryEdit.color.code))
     )
 
   def list() = Action.async {
@@ -68,14 +80,6 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
   def newCategory() = Action { implicit req =>
     implicit val token = CSRF.getToken(req).get
 
-    val categoryNewForm = Form (
-      mapping(
-        "name" -> nonEmptyText,
-        "slug" -> nonEmptyText,
-        "color" -> shortNumber
-      )(CategoryNew.apply)(CategoryNew.unapply)
-    )
-    
     val vv = ViewValueCategoryNew(
       title  = "カテゴリー新規登録",
       cssSrc = Seq("main.css"),
@@ -90,14 +94,6 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
 
     implicit val token = CSRF.getToken(req).get
 
-    val categoryNewForm = Form (
-      mapping(
-        "name" -> nonEmptyText,
-        "slug" -> nonEmptyText.verifying("英数字のみ", {slug => slug.matches("^[a-zA-Z0-9]*$")}),
-        "color" -> shortNumber
-      )(CategoryNew.apply)(CategoryNew.unapply)
-    )
-
     categoryNewForm.bindFromRequest().fold(
       formWithErrors => {
         Future.successful {
@@ -111,7 +107,7 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
       },
       inputData => {
         for {
-          newCategory <- CategoryRepository.add(Category(name = inputData.name, slug = inputData.slug, color = Category.CategoryColor(inputData.color)))
+          newCategory <- CategoryRepository.add(Category(name = inputData.name, slug = inputData.slug, color = inputData.color))
         } yield {
           Redirect(routes.CategoryListController.list())
         }
@@ -176,7 +172,7 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
       },
       inputData => {
         for {
-          editCategory <- CategoryRepository.update(Category(id=categoryId, name = inputData.name, slug = inputData.slug, color=Category.CategoryColor(inputData.color)))
+          editCategory <- CategoryRepository.update(Category(id=categoryId, name = inputData.name, slug = inputData.slug, color=inputData.color))
         } yield {
           Redirect(routes.CategoryListController.list())
         }

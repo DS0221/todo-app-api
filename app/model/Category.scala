@@ -1,6 +1,7 @@
 package model
 
 import play.api.data.Form
+import lib.model.Category
 
 // categoryのviewvalue
 case class ViewValueCategoryList(
@@ -36,11 +37,11 @@ case class CategoryForm(
 case class CategoryNew(
   name:      String,
   slug:      String,
-  color:     Short
+  color:     Category.CategoryColor
 )
 
 case class CategoryEdit(
   name:      String,
   slug:      String,
-  color:     Short
+  color:     Category.CategoryColor
 )

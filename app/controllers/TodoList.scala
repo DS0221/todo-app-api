@@ -50,7 +50,9 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
       "body" -> text,
       "category" -> longNumber,
       "state" -> shortNumber
-    )(ToDoEdit.apply)(ToDoEdit.unapply)
+    )
+    ((title: String, body:String, category:Long, state:Short) => ToDoEdit.apply(title, body, category, ToDo.Status(state)))
+    (ToDoEdit => Option(ToDoEdit.title, ToDoEdit.body, ToDoEdit.category, ToDoEdit.state.code))
   )
 
   val status = ToDo.Status.values.map(value => (value.code.toString(),value.name))
@@ -179,7 +181,7 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
       },
       inputData => {
         for {
-          newTodo <- ToDoRepository.update(ToDo(id=todoId, title = inputData.title, body = inputData.body, categoryId = inputData.category, state=ToDo.Status(inputData.state)))
+          newTodo <- ToDoRepository.update(ToDo(id=todoId, title = inputData.title, body = inputData.body, categoryId = inputData.category, state=inputData.state))
         } yield {
           Redirect(routes.TodoListController.list())
         }

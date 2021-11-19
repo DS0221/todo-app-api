@@ -1,6 +1,7 @@
 package model
 
 import play.api.data.Form
+import lib.model.ToDo
 
 // todoの一覧出力時viewvalue
 case class ViewValueToDoList(
@@ -46,5 +47,5 @@ case class ToDoEdit(
   title:      String,
   body:       String,
   category:   Long,
-  state:      Short
+  state:      ToDo.Status
 )
