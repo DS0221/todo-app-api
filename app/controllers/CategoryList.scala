@@ -38,20 +38,16 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
       mapping(
         "name" -> nonEmptyText,
         "slug" -> nonEmptyText.verifying("英数字のみ", {slug => slug.matches("^[a-zA-Z0-9]*$")}),
-        "color" -> shortNumber
-      )
-      ((name: String, slug: String, color: Short) => CategoryNew.apply(name, slug, Category.CategoryColor(color)))
-      (CategoryNew => Option(CategoryNew.name, CategoryNew.slug, CategoryNew.color.code))
+        "color" -> shortNumber.transform[Category.CategoryColor](Category.CategoryColor.apply, _.code)
+      )(CategoryNew.apply)(CategoryNew.unapply)
     )
 
   val categoryEditForm = Form (
       mapping(
         "name" -> nonEmptyText,
         "slug" -> nonEmptyText.verifying("英数字のみ", {slug => slug.matches("^[a-zA-Z0-9]*$")}),
-        "color" -> shortNumber
-      )
-      ((name: String, slug: String, color: Short) => CategoryEdit.apply(name, slug, Category.CategoryColor(color)))
-      (CategoryEdit => Option(CategoryEdit.name, CategoryEdit.slug, CategoryEdit.color.code))
+        "color" -> shortNumber.transform[Category.CategoryColor](Category.CategoryColor.apply, _.code)
+      )(CategoryEdit.apply)(CategoryEdit.unapply)
     )
 
   def list() = Action.async {
