@@ -14,9 +14,9 @@ POST    /newTodoSave                  controllers.TodoListController.newTodoSave
 
 GET     /editTodo/:todoId             controllers.TodoListController.editTodo(todoId : Long)
 
-POST    /editTodoSave                 controllers.TodoListController.editTodoSave(todoId : Long)
+PUT     /editTodoSave                 controllers.TodoListController.editTodoSave()
 
-GET     /deleteTodo/:todoId           controllers.TodoListController.deleteTodo(todoId : Long)
+DELETE  /deleteTodo/:todoId           controllers.TodoListController.deleteTodo(todoId : Long)
 
 GET     /categoryList                 controllers.CategoryListController.list
 

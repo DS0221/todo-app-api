@@ -30,7 +30,12 @@ import lib.model.ToDo
 import monix.execution.misc.AsyncVar
 import lib.model.Category
 import cats.instances.long
-import java.{util => ju}
+import json.writes.JsValueTodoList
+import json.reads.JsValueCreateTodo
+import json.writes.JsValueDeleteTodo
+import play.api.libs.json.Json
+import json.writes.JsValueSelectTodo
+import json.reads.JsValueUpdateTodo
 
 
 @Singleton
@@ -80,14 +85,15 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
           todo.id
         )
       }
-
-      val vv = ViewValueToDoList(
-        title  = "Todo一覧",
-        cssSrc = Seq("main.css"),
-        jsSrc  = Seq("main.js"),
-        toDoList = todoList
-      )
-      Ok(views.html.TodoList(vv))
+      val jsValue = JsValueTodoList.apply(todoList)
+      Ok(Json.toJson(jsValue))
+      // val vv = ViewValueToDoList(
+      //   title  = "Todo一覧",
+      //   cssSrc = Seq("main.css"),
+      //   jsSrc  = Seq("main.js"),
+      //   toDoList = todoList
+      // )
+      // Ok(views.html.TodoList(vv))
     }
   }
 
@@ -108,28 +114,21 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
  
   }
 
-  def newTodoSave() = Action.async { implicit req =>
+  def newTodoSave() = Action(parse.json).async { implicit req =>
 
-    implicit val token = CSRF.getToken(req).get
-    todoInputForm.bindFromRequest().fold(
-      formWithErrors => {
-        for {
-          categories <- CategoryRepository.getAll().map(categories => categories.map(category => (category.id.toString(),category.v.name)))
-        }yield {
-          BadRequest(views.html.NewTodo(ViewValueToDoNew(
-            title  = "Todo新規登録",
-            cssSrc = Seq("main.css"),
-            jsSrc  = Seq("main.js"),
-            inputForm = formWithErrors
-          ), categories))
+    req.body.validate[JsValueCreateTodo].fold(
+      erros => {
+        Future.successful{
+          BadRequest("error")
         }
       },
-      inputData => {
+      todoData => {
         for {
-          newTodo <- ToDoRepository.add(ToDo(title = inputData.title, body = inputData.body, categoryId = inputData.category))
-        } yield {
-          Redirect(routes.TodoListController.list())
-        }
+           newTodo <- ToDoRepository.add(ToDo(title = todoData.title, body = todoData.body, categoryId = todoData.category))
+         } yield {
+           val jsValue = JsValueCreateTodo.apply(todoData.title, todoData.body, todoData.category)
+           Ok(Json.toJson(jsValue))
+         }
       }
     )
   }
@@ -138,55 +137,44 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
     implicit val token = CSRF.getToken(req).get
     
     val todoFuture = ToDoRepository.get(ToDo.Id(todoId))
-    val categoryFuture = CategoryRepository.getAll().map(categories => categories.map(category => (category.id.toString(),category.v.name)))
+    //val categoryFuture = CategoryRepository.getAll().map(categories => categories.map(category => (category.id.toString(),category.v.name)))
     
     for {
       todo <- todoFuture
-      categories <- categoryFuture
+      //categories <- categoryFuture
     }yield {
       val todoData = todo.get.v
-      val todoMap = Map(
-        "title" -> todoData.title,
-        "body"  -> todoData.body,
-        "category" -> todoData.categoryId.toString(),
-        "state" -> todoData.state.code.toString()
+      val todoEdit = ToDoEdit.apply(
+        todoData.title,
+        todoData.body,
+        todoData.categoryId,
+        todoData.state
       )
-      val vv = ViewValueToDoEdit(
-        title  = "Todo修正",
-        cssSrc = Seq("main.css"),
-        jsSrc  = Seq("main.js"),
-        inputForm = todoEditForm.bind(todoMap),
-        todoId
-      )
-      Ok(views.html.EditTodo(vv,categories,status))
+      
+      val jsValue = JsValueSelectTodo.apply(todoEdit)
+      Ok(Json.toJson(jsValue))
+
     }
  
   }
 
-  def editTodoSave(todoId : Long) = Action.async { implicit req =>
-    implicit val token = CSRF.getToken(req).get
-    todoEditForm.bindFromRequest().fold(
-      formWithErrors => {
-        for {
-          categories <- CategoryRepository.getAll().map(categories => categories.map(category => (category.id.toString(),category.v.name)))
-        }yield {
-          BadRequest(views.html.EditTodo(ViewValueToDoEdit(
-            title  = "Todo修正",
-            cssSrc = Seq("main.css"),
-            jsSrc  = Seq("main.js"),
-            inputForm = formWithErrors,
-            todoId
-          ), categories, status))
+  def editTodoSave() = Action(parse.json).async { implicit req =>
+    req.body.validate[JsValueUpdateTodo].fold(
+      erros => {
+        Future.successful{
+          BadRequest("error")
         }
       },
       inputData => {
         for {
-          newTodo <- ToDoRepository.update(ToDo(id=todoId, title = inputData.title, body = inputData.body, categoryId = inputData.category, state=inputData.state))
-        } yield {
-          Redirect(routes.TodoListController.list())
-        }
+           newTodo <- ToDoRepository.update(ToDo(id=inputData.id, title = inputData.title, body = inputData.body, categoryId = inputData.category, state=ToDo.Status(inputData.state)))
+         } yield {
+           val jsValue = JsValueUpdateTodo.apply(inputData.title, inputData.body, inputData.category, inputData.state, inputData.id)
+           Ok(Json.toJson(jsValue))
+         }
       }
     )
+
   }
 
   def deleteTodo(todoId : Long) = Action.async { implicit req =>
@@ -194,7 +182,8 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
     for {
       deleteTodo <- deleteFuture
     }yield {
-      Redirect(routes.TodoListController.list())
+      val jsValue = JsValueDeleteTodo.apply(deleteTodo.get.id)
+      Ok(Json.toJson(jsValue))
     }
   }
 
