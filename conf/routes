@@ -8,6 +8,8 @@ GET     /                             controllers.HomeController.index
 
 GET     /todoList                     controllers.TodoListController.list
 
+GET     /todoStatusList               controllers.TodoListController.statusList
+
 GET     /newTodo                      controllers.TodoListController.newTodo
 
 POST    /newTodoSave                  controllers.TodoListController.newTodoSave

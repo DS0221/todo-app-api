@@ -26,6 +26,8 @@ import play.filters.csrf.CSRF
 import lib.model.Category
 import akka.http.scaladsl.model.HttpHeader
 import scala.concurrent.Future
+import play.api.libs.json.Json
+import json.writes.JsValueCategoryList
 
 
 
@@ -54,21 +56,17 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
 
     CategoryRepository.getAll().map(
       categories => {
-        val vv = ViewValueCategoryList(
-          title  = "カテゴリー一覧",
-          cssSrc = Seq("main.css"),
-          jsSrc  = Seq("main.js"),
-          categoryList = categories.map(
-            category =>
+        val categoryList = categories.map(
+          category =>
             CategoryForm(
               category.v.name,
               category.v.slug,
               category.v.color.name,
               category.id
             )    
-          )
         )
-        Ok(views.html.CategoryList(vv))
+        val jsValue = JsValueCategoryList.apply(categoryList)
+        Ok(Json.toJson(jsValue))
       }
     )
   }

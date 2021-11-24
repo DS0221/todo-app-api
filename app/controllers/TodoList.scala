@@ -36,6 +36,7 @@ import json.writes.JsValueDeleteTodo
 import play.api.libs.json.Json
 import json.writes.JsValueSelectTodo
 import json.reads.JsValueUpdateTodo
+import json.writes.JsValueTodoStatusList
 
 
 @Singleton
@@ -97,6 +98,12 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
     }
   }
 
+  def statusList() = Action {
+    val todoStatus = ToDo.Status.values
+    val jsValue = JsValueTodoStatusList.apply(todoStatus)
+    Ok(Json.toJson(jsValue))
+  }
+
   def newTodo() = Action.async { implicit req =>
     implicit val token = CSRF.getToken(req).get
     
@@ -117,14 +124,14 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
   def newTodoSave() = Action(parse.json).async { implicit req =>
 
     req.body.validate[JsValueCreateTodo].fold(
-      erros => {
+      errors => {
         Future.successful{
           BadRequest("error")
         }
       },
       todoData => {
         for {
-           newTodo <- ToDoRepository.add(ToDo(title = todoData.title, body = todoData.body, categoryId = todoData.category))
+           newTodo <- ToDoRepository.add(ToDo(title = todoData.title, body = todoData.body, categoryId = todoData.category.toLong))
          } yield {
            val jsValue = JsValueCreateTodo.apply(todoData.title, todoData.body, todoData.category)
            Ok(Json.toJson(jsValue))
@@ -160,14 +167,14 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
 
   def editTodoSave() = Action(parse.json).async { implicit req =>
     req.body.validate[JsValueUpdateTodo].fold(
-      erros => {
+      errors => {
         Future.successful{
           BadRequest("error")
         }
       },
       inputData => {
         for {
-           newTodo <- ToDoRepository.update(ToDo(id=inputData.id, title = inputData.title, body = inputData.body, categoryId = inputData.category, state=ToDo.Status(inputData.state)))
+           newTodo <- ToDoRepository.update(ToDo(id=inputData.id, title = inputData.title, body = inputData.body, categoryId = inputData.category.toLong, state=ToDo.Status(inputData.state.toShort)))
          } yield {
            val jsValue = JsValueUpdateTodo.apply(inputData.title, inputData.body, inputData.category, inputData.state, inputData.id)
            Ok(Json.toJson(jsValue))

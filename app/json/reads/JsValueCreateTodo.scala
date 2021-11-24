@@ -7,7 +7,7 @@ import play.api.libs.json.Writes
 case class JsValueCreateTodo(
     title:      String,
     body:       String,
-    category:   Long
+    category:   String
 )
 
 object JsValueCreateTodo {
