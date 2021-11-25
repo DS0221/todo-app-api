@@ -28,6 +28,9 @@ import akka.http.scaladsl.model.HttpHeader
 import scala.concurrent.Future
 import play.api.libs.json.Json
 import json.writes.JsValueCategoryList
+import json.writes.JsValueCategoryColorList
+import json.reads.JsValueCreateCategory
+import json.writes.JsValueDeleteCategory
 
 
 
@@ -71,6 +74,12 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
     )
   }
 
+  def categoryColorList() = Action {
+    val colors = Category.CategoryColor.values
+    val jsValue = JsValueCategoryColorList.apply(colors)
+    Ok(Json.toJson(jsValue))
+  }
+
   def newCategory() = Action { implicit req =>
     implicit val token = CSRF.getToken(req).get
 
@@ -84,31 +93,25 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
     Ok(views.html.NewCategory(vv,colorMap))
   }
 
-  def newCategorySave() = Action.async { implicit req =>
+  def newCategorySave() = Action(parse.json).async { implicit req =>
 
-    implicit val token = CSRF.getToken(req).get
-
-    categoryNewForm.bindFromRequest().fold(
-      formWithErrors => {
-        Future.successful {
-          BadRequest(views.html.NewCategory(ViewValueCategoryNew(
-            title  = "カテゴリー新規登録",
-            cssSrc = Seq("main.css"),
-            jsSrc  = Seq("main.js"),
-            inputForm = formWithErrors
-          ), colorMap))
+    req.body.validate[JsValueCreateCategory].fold(
+      errors => {
+        Future.successful{
+          BadRequest("error")
         }
       },
-      inputData => {
+      categoryData => {
         for {
-          newCategory <- CategoryRepository.add(Category(name = inputData.name, slug = inputData.slug, color = inputData.color))
-        } yield {
-          Redirect(routes.CategoryListController.list())
-        }
+           newCategory <- CategoryRepository.add(Category(name = categoryData.name, slug = categoryData.slug, color = Category.CategoryColor(categoryData.color.toShort)))
+         } yield {
+           val jsValue = JsValueCreateCategory.apply(categoryData.name, categoryData.slug, categoryData.color)
+           Ok(Json.toJson(jsValue))
+         }
       }
     )
   }
-
+  
   def deleteCategory(categoryId : Long) = Action.async { implicit req =>
     val deleteFuture = CategoryRepository.remove(Category.Id(categoryId))
 
@@ -118,7 +121,8 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
       deleteCategory <- deleteFuture
       deleteTodo <- deleteTodoFuture
     }yield {
-      Redirect(routes.CategoryListController.list())
+      val jsValue = JsValueDeleteCategory.apply(deleteCategory.get.id)
+      Ok(Json.toJson(jsValue))
     }
   }
 

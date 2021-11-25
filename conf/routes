@@ -22,11 +22,13 @@ DELETE  /deleteTodo/:todoId           controllers.TodoListController.deleteTodo(
 
 GET     /categoryList                 controllers.CategoryListController.list
 
+GET     /categoryColorList            controllers.CategoryListController.categoryColorList
+
 GET     /newCategory                  controllers.CategoryListController.newCategory
 
 POST    /newCategorySave              controllers.CategoryListController.newCategorySave
 
-GET     /deleteCategory/:categoryId   controllers.CategoryListController.deleteCategory(categoryId : Long)
+DELETE  /deleteCategory/:categoryId   controllers.CategoryListController.deleteCategory(categoryId : Long)
 
 GET     /editCategory/:categoryId     controllers.CategoryListController.editCategory(categoryId : Long)
 
