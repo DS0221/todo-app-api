@@ -7,7 +7,7 @@ import play.api.libs.json.Writes
 case class JsValueUpdateCategory(
     name:    String,
     slug:    String,
-    color:   String,
+    color:   Short,
     id:      Long
 )
 

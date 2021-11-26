@@ -131,7 +131,7 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
       },
       todoData => {
         for {
-           newTodo <- ToDoRepository.add(ToDo(title = todoData.title, body = todoData.body, categoryId = todoData.category.toLong))
+           newTodo <- ToDoRepository.add(ToDo(title = todoData.title, body = todoData.body, categoryId = todoData.category))
          } yield {
            val jsValue = JsValueCreateTodo.apply(todoData.title, todoData.body, todoData.category)
            Ok(Json.toJson(jsValue))
@@ -174,7 +174,7 @@ class TodoListController @Inject()(val controllerComponents: ControllerComponent
       },
       inputData => {
         for {
-           newTodo <- ToDoRepository.update(ToDo(id=inputData.id, title = inputData.title, body = inputData.body, categoryId = inputData.category.toLong, state=ToDo.Status(inputData.state.toShort)))
+           newTodo <- ToDoRepository.update(ToDo(id=inputData.id, title = inputData.title, body = inputData.body, categoryId = inputData.category, state=ToDo.Status(inputData.state)))
          } yield {
            val jsValue = JsValueUpdateTodo.apply(inputData.title, inputData.body, inputData.category, inputData.state, inputData.id)
            Ok(Json.toJson(jsValue))

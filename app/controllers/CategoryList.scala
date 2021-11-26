@@ -105,7 +105,7 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
       },
       categoryData => {
         for {
-           newCategory <- CategoryRepository.add(Category(name = categoryData.name, slug = categoryData.slug, color = Category.CategoryColor(categoryData.color.toShort)))
+           newCategory <- CategoryRepository.add(Category(name = categoryData.name, slug = categoryData.slug, color = Category.CategoryColor(categoryData.color)))
          } yield {
            val jsValue = JsValueCreateCategory.apply(categoryData.name, categoryData.slug, categoryData.color)
            Ok(Json.toJson(jsValue))
@@ -157,7 +157,7 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
       },
       inputData => {
         for {
-           editCategory <- CategoryRepository.update(Category(id=inputData.id, slug = inputData.slug, name = inputData.name, color = Category.CategoryColor(inputData.color.toShort)))
+           editCategory <- CategoryRepository.update(Category(id=inputData.id, slug = inputData.slug, name = inputData.name, color = Category.CategoryColor(inputData.color)))
          } yield {
            val jsValue = JsValueUpdateCategory.apply(inputData.name, inputData.slug, inputData.color, inputData.id)
            Ok(Json.toJson(jsValue))

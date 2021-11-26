@@ -7,8 +7,8 @@ import play.api.libs.json.Writes
 case class JsValueUpdateTodo(
     title:      String,
     body:       String,
-    category:   String,
-    state:      String,
+    category:   Long,
+    state:      Short,
     id:         Long
 )
 

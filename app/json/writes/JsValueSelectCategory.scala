@@ -7,7 +7,7 @@ import model.CategoryEdit
 case class JsValueSelectCategory(
     name:    String,
     slug:    String,
-    color:   String
+    color:   Short
 )
 
 object JsValueSelectCategory {
@@ -17,6 +17,6 @@ object JsValueSelectCategory {
       JsValueSelectCategory(
           name  = categoryEdit.name,
           slug  = categoryEdit.slug,
-          color = categoryEdit.color.code.toString
+          color = categoryEdit.color.code
       )
 }

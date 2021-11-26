@@ -7,7 +7,7 @@ import play.api.libs.json.Writes
 case class JsValueCreateCategory(
     name:    String,
     slug:    String,
-    color:   String
+    color:   Short
 )
 
 object JsValueCreateCategory {

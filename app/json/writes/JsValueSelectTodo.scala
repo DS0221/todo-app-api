@@ -7,8 +7,8 @@ import model.ToDoEdit
 case class JsValueSelectTodo(
     title:      String,
     body:       String,
-    category:   String,
-    state:      String
+    category:   Long,
+    state:      Short
 )
 
 object JsValueSelectTodo {
@@ -18,7 +18,7 @@ object JsValueSelectTodo {
       JsValueSelectTodo(
           title         = todoEdit.title,
           body          = todoEdit.body,
-          state         = todoEdit.state.code.toString(),
-          category      = todoEdit.category.toString()
+          state         = todoEdit.state.code,
+          category      = todoEdit.category
       )
 }
