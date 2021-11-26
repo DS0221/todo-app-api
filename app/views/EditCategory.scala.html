@@ -3,7 +3,7 @@
 
 @common.Default(vv){
 <div style="width: 100%;">
-    @form(action = routes.CategoryListController.editCategorySave(vv.categoryId)) {
+    @form(action = routes.CategoryListController.editCategorySave) {
         @CSRF.formField
         <fieldset style="margin-bottom: 20px;">
             @inputText(vv.inputForm("name"), '_label -> "カテゴリー名", '_class -> "newTodoTitle")

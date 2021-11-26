@@ -31,6 +31,8 @@ import json.writes.JsValueCategoryList
 import json.writes.JsValueCategoryColorList
 import json.reads.JsValueCreateCategory
 import json.writes.JsValueDeleteCategory
+import json.writes.JsValueSelectCategory
+import json.reads.JsValueUpdateCategory
 
 
 
@@ -127,7 +129,6 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
   }
 
   def editCategory(categoryId : Long) = Action.async { implicit req =>
-    implicit val token = CSRF.getToken(req).get
     
     val categoryFuture = CategoryRepository.get(Category.Id(categoryId))
     
@@ -135,45 +136,32 @@ class CategoryListController @Inject()(val controllerComponents: ControllerCompo
       category <- categoryFuture
     }yield {
       val categoryData = category.get.v
-      val categoryMap = Map(
-        "name" -> categoryData.name,
-        "slug"  -> categoryData.slug,
-        "color" -> categoryData.color.code.toString()
+      val categoryEdit = CategoryEdit.apply(
+        categoryData.name,
+        categoryData.slug,
+        categoryData.color
       )
-      val vv = ViewValueCategoryEdit(
-        title  = "カテゴリー修正",
-        cssSrc = Seq("main.css"),
-        jsSrc  = Seq("main.js"),
-        inputForm = categoryEditForm.bind(categoryMap),
-        categoryId
-      )
-      Ok(views.html.EditCategory(vv,colorMap))
+
+      val jsValue = JsValueSelectCategory.apply(categoryEdit)
+      Ok(Json.toJson(jsValue))
     }
- 
   }
 
-  def editCategorySave(categoryId : Long) = Action.async { implicit req =>
-    implicit val token = CSRF.getToken(req).get
+  def editCategorySave() = Action(parse.json).async { implicit req =>
 
-    categoryEditForm.bindFromRequest().fold(
-      formWithErrors => {
-        Future.successful {
-          BadRequest(views.html.EditCategory(ViewValueCategoryEdit(
-              title  = "カテゴリー修正",
-              cssSrc = Seq("main.css"),
-              jsSrc  = Seq("main.js"),
-              inputForm = formWithErrors,
-              categoryId
-            ), colorMap))
+    req.body.validate[JsValueUpdateCategory].fold(
+      errors => {
+        Future.successful{
+          BadRequest("error")
         }
-          
       },
       inputData => {
         for {
-          editCategory <- CategoryRepository.update(Category(id=categoryId, name = inputData.name, slug = inputData.slug, color=inputData.color))
-        } yield {
-          Redirect(routes.CategoryListController.list())
-        }
+           editCategory <- CategoryRepository.update(Category(id=inputData.id, slug = inputData.slug, name = inputData.name, color = Category.CategoryColor(inputData.color.toShort)))
+         } yield {
+           val jsValue = JsValueUpdateCategory.apply(inputData.name, inputData.slug, inputData.color, inputData.id)
+           Ok(Json.toJson(jsValue))
+         }
       }
     )
   }
